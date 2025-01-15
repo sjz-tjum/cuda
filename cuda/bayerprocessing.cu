@@ -8,6 +8,7 @@ int main(void)
 {
   set_GPU();  
   std::cout<<"请输入图片的长和宽"<<std::endl;
+  int width,height;
   std::cin>>width>>height;
   readBayer_img Bayer{"example",width,height};
   std::vector<unsigned char> Bayer_data_ = Bayer.readBayerImage("example",width,height);
@@ -19,16 +20,15 @@ int main(void)
   size_t Bayer_Bytecount = Bayer_ElemenCount*sizeof(unsigned char);
   size_t Bgr_Bytecount = BGR_ElementCount * sizeof(unsigned char);
 
-
   unsigned char *device_bayer_data; unsigned char*device_bgr_data;
-  device_bayer_data = (float *)malloc(Bayer_Bytecount);
-  device_bgr_data = (float *)malloc(Bgr_Bytecount);
+  device_bayer_data = (float *)cudaMalloc(Bayer_Bytecount);
+  device_bgr_data = (float *)cudaMalloc(Bgr_Bytecount);
   //复制主机数据到GPU
   cudaMemcpy(device_bayer_data,Bayer_data_.data(), Bayer_Bytecount, cudaMemcpyHostToDevice);
   //设置网格数和线程数
   dim3 threadsPerBlock(16, 16);
   dim3 blocksPerGrid((width + threadsPerBlock.x - 1) / threadsPerBlock.x, (height + threadsPerBlock.y - 1) / threadsPerBlock.y);
-
+  
 
 
 }
